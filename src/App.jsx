@@ -525,9 +525,8 @@ export default function App() {
   const [msgs, setMsgs] = useState([{ r: "bot", t: BOT_GREETING }]);
   const [inp, setInp] = useState("");
   const [typing, setTyping] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [user, setUser] = useState(() => getSession());
+  const [user, setUser] = useState(() => { try { return JSON.parse(localStorage.getItem("onop_session_v3") || "null"); } catch { return null; } });
   const chatEnd = useRef(null);
 
   useEffect(() => {
@@ -573,7 +572,6 @@ export default function App() {
   return (
     <>
       <style>{STYLE}</style>
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onSuccess={u => { setUser(u); setShowAuth(false); }} />}
       <div style={{ minHeight: "100vh", background: "#eef1f6", fontFamily: "'Inter',sans-serif" }}>
 
         {/* NAV */}
@@ -593,18 +591,6 @@ export default function App() {
               <div style={{ color: "#fff", fontWeight: 900, fontSize: 13.5, letterSpacing: .3, fontFamily: "'Playfair Display',serif" }}>One Nation, One Portal</div>
               <div style={{ color: "#D4A017", fontSize: 9, letterSpacing: 1.5, fontWeight: 700 }}>Digital India</div>
             </div>
-          </div>
-          <div style={{ display: "flex" }}>
-            {NAV.map(n => (
-              <button key={n.id} onClick={() => setPage(n.id)} style={{
-                background: page === n.id ? "rgba(255,153,51,.18)" : "none",
-                border: "none", borderBottom: page === n.id ? "2px solid #FF9933" : "2px solid transparent",
-                color: page === n.id ? "#FF9933" : "rgba(255,255,255,.72)",
-                padding: "0 12px", height: 58, cursor: "pointer",
-                fontWeight: 700, fontSize: 11.5, fontFamily: "inherit",
-                transition: "all .2s", whiteSpace: "nowrap",
-              }}>{n.icon} {n.label}</button>
-            ))}
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
 
@@ -672,11 +658,14 @@ export default function App() {
                 )}
               </div>
             ) : (
-              <button onClick={() => setShowAuth(true)} style={{
-                background: "linear-gradient(135deg,#FF9933,#e07b20)", border: "none",
-                borderRadius: 6, padding: "7px 16px", color: "#fff",
-                fontWeight: 800, cursor: "pointer", fontFamily: "inherit", fontSize: 11,
-              }}>Login / Register</button>
+              page !== "home" && (
+                <button onClick={() => setPage("home")} style={{
+                  background: "rgba(255,255,255,.1)", border: "1.5px solid rgba(255,255,255,.25)",
+                  borderRadius: 8, padding: "7px 16px", color: "#fff",
+                  fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 12,
+                  display: "flex", alignItems: "center", gap: 6,
+                }}>← Back</button>
+              )
             )}
           </div>
         </nav>
@@ -688,20 +677,10 @@ export default function App() {
         </div>
 
         {/* USER WELCOME BANNER */}
-        {user && (
-          <div style={{ background: "linear-gradient(90deg,#1b5e20,#2e7d32)", padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-            <div style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>
-              🙏 Namaste, <strong>{user.name?.split(" ")[0]}</strong>! Welcome to One Nation, One Portal.
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setPage("eligibility")} style={{ background: "#FF9933", border: "none", borderRadius: 6, padding: "6px 14px", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>🎯 Check My Eligibility</button>
-              <button onClick={() => setPage("schemes")} style={{ background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.3)", borderRadius: 6, padding: "6px 14px", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>📋 Browse Schemes</button>
-            </div>
-          </div>
-        )}
+
 
         {/* PAGE */}
-        <div style={{ paddingBottom: 68 }}>
+        <div style={{ paddingBottom: 76 }}>
           {page === "home" && <HomePage setPage={setPage} />}
           {page === "eligibility" && <EligibilityPage setPage={setPage} />}
           {page === "schemes" && <SchemesPage />}
@@ -710,10 +689,19 @@ export default function App() {
         </div>
 
         {/* MOBILE BOTTOM NAV */}
-        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#0b1929", borderTop: "1px solid rgba(255,153,51,.3)", display: "flex", zIndex: 8000, padding: "3px 0" }}>
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#0b1929", borderTop: "2px solid rgba(255,153,51,.4)", display: "flex", zIndex: 8000, paddingBottom: "env(safe-area-inset-bottom,4px)" }}>
           {NAV.map(n => (
-            <button key={n.id} onClick={() => setPage(n.id)} style={{ flex: 1, background: "none", border: "none", padding: "7px 0", color: page === n.id ? "#FF9933" : "rgba(255,255,255,.4)", cursor: "pointer", fontFamily: "inherit", fontSize: 8.5, fontWeight: 700, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-              <span style={{ fontSize: 17 }}>{n.icon}</span>{n.label}
+            <button key={n.id} onClick={() => setPage(n.id)} style={{
+              flex: 1, background: "none", border: "none",
+              padding: "10px 2px 8px",
+              color: page === n.id ? "#FF9933" : "rgba(255,255,255,.45)",
+              cursor: "pointer", fontFamily: "inherit", fontSize: 9, fontWeight: 800,
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+              borderTop: page === n.id ? "2px solid #FF9933" : "2px solid transparent",
+              transition: "all .2s",
+            }}>
+              <span style={{ fontSize: 19, lineHeight: 1 }}>{n.icon}</span>
+              <span style={{ lineHeight: 1, letterSpacing: 0.2 }}>{n.label}</span>
             </button>
           ))}
         </div>
@@ -727,7 +715,7 @@ export default function App() {
             <div style={{ background: "linear-gradient(135deg,#0b1929,#162840)", padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FF9933", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🤖</div>
               <div>
-                <div style={{ color: "#fff", fontWeight: 800, fontSize: 13 }}>Sahayak – AI Assistant</div>
+                <div style={{ color: "#fff", fontWeight: 800, fontSize: 13 }}>Sahayak – Scheme Assistant</div>
                 <div style={{ color: "#4caf50", fontSize: 10, display: "flex", alignItems: "center", gap: 4 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4caf50", display: "inline-block" }} />
                   Online · Replies instantly
@@ -795,7 +783,7 @@ function HomePage({ setPage }) {
           <button onClick={() => setPage("schemes")} style={{ background: "linear-gradient(135deg,#FF9933,#e07b20)", border: "none", borderRadius: 40, padding: "10px 24px", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: 13 }}>Search</button>
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 36, flexWrap: "wrap", marginTop: 36 }}>
-          {[["60+", "Schemes"], ["80+", "Portals"], ["60+", "Schemes"], ["1.4B", "Citizens"]].map(([n, l]) => (
+          {[["60+", "Schemes"], ["80+", "Portals"], ["24/7", "Support"], ["1.4B", "Citizens"]].map(([n, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: 900, color: "#FF9933" }}>{n}</div>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", letterSpacing: 2 }}>{l.toUpperCase()}</div>
@@ -1156,217 +1144,187 @@ function HelpPage() {
   const [searching, setSearching] = useState(false);
 
   const CSC_DB = {
-    "600001":[{name:"Chennai Central CSC",addr:"Anna Salai, Chennai – 600001",km:"0.3",hrs:"Mon–Sat 9AM–6PM",ph:"+91 44 2852 1234",svcs:"Aadhaar, PAN, Passport, Scholarship, PM Kisan"}],
-    "600045":[{name:"Nandambakkam Common Service Centre",addr:"123 GST Road, Nandambakkam, Chennai – 600045",km:"0.8",hrs:"Mon–Sat 9AM–6PM",ph:"+91 99999 12345",svcs:"Aadhaar, PAN, Passport, Scholarship, PM Kisan, Income/Caste Certificate"}],
-    "600089":[{name:"Pallavaram CSC",addr:"High Road, Pallavaram, Chennai – 600043",km:"1.2",hrs:"Mon–Sat 9AM–6PM",ph:"+91 44 2264 3456",svcs:"All government services"}],
-    "400001":[{name:"Mumbai CSC – Fort",addr:"MG Road, Fort, Mumbai – 400001",km:"0.4",hrs:"Mon–Sat 9AM–6PM",ph:"+91 22 2265 4321",svcs:"Aadhaar, PAN, Passport, Income Tax"}],
-    "110001":[{name:"Connaught Place CSC",addr:"Block D, Connaught Place, New Delhi – 110001",km:"0.2",hrs:"Mon–Sat 9AM–7PM",ph:"+91 11 2341 5678",svcs:"All central government services"}],
-    "560001":[{name:"Bangalore MG Road CSC",addr:"MG Road, Bangalore – 560001",km:"0.5",hrs:"Mon–Sat 9AM–6PM",ph:"+91 80 2558 1234",svcs:"Aadhaar, PAN, Scholarship, PM Kisan"}],
-    "500001":[{name:"Hyderabad Abids CSC",addr:"Abids, Hyderabad – 500001",km:"0.6",hrs:"Mon–Sat 9AM–6PM",ph:"+91 40 2322 5678",svcs:"Aadhaar, PAN, Voter ID, Scholarship"}],
-    "700001":[{name:"Kolkata BBD Bag CSC",addr:"BBD Bag, Kolkata – 700001",km:"0.3",hrs:"Mon–Sat 9AM–6PM",ph:"+91 33 2248 9012",svcs:"Aadhaar, PAN, Scholarship, Jan Dhan"}],
-    "380001":[{name:"Ahmedabad Lal Darwaja CSC",addr:"Lal Darwaja, Ahmedabad – 380001",km:"0.4",hrs:"Mon–Sat 9AM–6PM",ph:"+91 79 2550 3456",svcs:"Aadhaar, PAN, PM Kisan, Scholarship"}],
-    "411001":[{name:"Pune Camp CSC",addr:"Camp, Pune – 411001",km:"0.5",hrs:"Mon–Sat 9AM–6PM",ph:"+91 20 2612 7890",svcs:"All government services"}],
+    "600001":[{name:"Chennai Central CSC",addr:"Anna Salai, Chennai - 600001",km:"0.3",hrs:"Mon-Sat 9AM-6PM",ph:"+91 44 2852 1234",svcs:"Aadhaar, PAN, Passport, Scholarship, PM Kisan"}],
+    "600045":[{name:"Nandambakkam Common Service Centre",addr:"123 GST Road, Nandambakkam, Chennai - 600045",km:"0.8",hrs:"Mon-Sat 9AM-6PM",ph:"+91 99999 12345",svcs:"Aadhaar, PAN, Passport, Scholarship, PM Kisan, Income/Caste Certificate"}],
+    "600089":[{name:"Pallavaram CSC",addr:"High Road, Pallavaram, Chennai - 600043",km:"1.2",hrs:"Mon-Sat 9AM-6PM",ph:"+91 44 2264 3456",svcs:"All government services"}],
+    "400001":[{name:"Mumbai CSC - Fort",addr:"MG Road, Fort, Mumbai - 400001",km:"0.4",hrs:"Mon-Sat 9AM-6PM",ph:"+91 22 2265 4321",svcs:"Aadhaar, PAN, Passport, Income Tax"}],
+    "110001":[{name:"Connaught Place CSC",addr:"Block D, Connaught Place, New Delhi - 110001",km:"0.2",hrs:"Mon-Sat 9AM-7PM",ph:"+91 11 2341 5678",svcs:"All central government services"}],
+    "560001":[{name:"Bangalore MG Road CSC",addr:"MG Road, Bangalore - 560001",km:"0.5",hrs:"Mon-Sat 9AM-6PM",ph:"+91 80 2558 1234",svcs:"Aadhaar, PAN, Scholarship, PM Kisan"}],
+    "500001":[{name:"Hyderabad Abids CSC",addr:"Abids, Hyderabad - 500001",km:"0.6",hrs:"Mon-Sat 9AM-6PM",ph:"+91 40 2322 5678",svcs:"Aadhaar, PAN, Voter ID, Scholarship"}],
+    "700001":[{name:"Kolkata BBD Bag CSC",addr:"BBD Bag, Kolkata - 700001",km:"0.3",hrs:"Mon-Sat 9AM-6PM",ph:"+91 33 2248 9012",svcs:"Aadhaar, PAN, Scholarship, Jan Dhan"}],
+    "380001":[{name:"Ahmedabad Lal Darwaja CSC",addr:"Lal Darwaja, Ahmedabad - 380001",km:"0.4",hrs:"Mon-Sat 9AM-6PM",ph:"+91 79 2550 3456",svcs:"Aadhaar, PAN, PM Kisan, Scholarship"}],
+    "411001":[{name:"Pune Camp CSC",addr:"Camp, Pune - 411001",km:"0.5",hrs:"Mon-Sat 9AM-6PM",ph:"+91 20 2612 7890",svcs:"All government services"}],
   };
-
   const searchCSC = () => {
     if (!pincode || pincode.length !== 6) { alert("Please enter a valid 6-digit pincode"); return; }
     setSearching(true);
     setTimeout(() => {
-      const result = CSC_DB[pincode] || CSC_DB[Object.keys(CSC_DB).find(k => k.startsWith(pincode.slice(0,3))) || ""] || [{name:"Nearest Common Service Centre",addr:`Area near pincode ${pincode}, India`,km:"Nearby",hrs:"Mon–Sat 9AM–6PM",ph:"1800-121-3468 (CSC Helpline)",svcs:"Aadhaar, PAN, Passport, Scholarship, PM Kisan, all govt services"}];
+      const result = CSC_DB[pincode] || CSC_DB[Object.keys(CSC_DB).find(k => k.startsWith(pincode.slice(0,3))) || ""] || [{name:"Nearest Common Service Centre",addr:"Area near pincode " + pincode + ", India",km:"Nearby",hrs:"Mon-Sat 9AM-6PM",ph:"1800-121-3468 (CSC Helpline)",svcs:"Aadhaar, PAN, Passport, Scholarship, PM Kisan, all govt services"}];
       setCscResult(result);
       setSearching(false);
     }, 600);
   };
 
-  const FAQS = [
-    ["How do I update my Aadhaar address online?", "Visit uidai.gov.in → 'Update Aadhaar' → Enter 12-digit Aadhaar → Select Address Update → Upload valid address proof (electricity bill/bank statement) → Pay ₹50 online → Note URN for tracking. Update reflects in 30–90 days."],
-    ["How to check Ayushman Bharat eligibility?", "Visit pmjay.gov.in → Click 'Am I Eligible' → Enter your mobile number or ration card number. If your family appears in the SECC 2011 database, you get ₹5 lakh/year free health cover at 27,000+ empanelled hospitals. Call 14555 for help."],
-    ["How to apply for PM Kisan?", "Visit pmkisan.gov.in → 'Farmers Corner' → 'New Farmer Registration' → Enter Aadhaar number → Fill land details and bank account → Submit. State government verifies and approves. After approval, ₹2,000 is credited every 4 months directly to your bank."],
-    ["Documents needed for National Scholarship?", "You need: (1) Aadhaar card, (2) Bank passbook with Aadhaar-linked account, (3) Last year's marksheet with minimum 50% marks, (4) Income certificate from SDM/Tehsildar (income < ₹8L), (5) Caste certificate if applicable, (6) College/school enrollment letter. Apply at scholarships.gov.in."],
-    ["How to open Jan Dhan zero-balance account?", "Visit any bank branch or post office with your Aadhaar card + 1 passport photo. Account opens same day. You get: zero minimum balance, RuPay debit card, ₹2 lakh accidental insurance, ₹30,000 life insurance, and ₹10,000 overdraft after 6 months."],
-    ["How to register on e-Shram portal?", "Visit eshram.gov.in → 'Register on e-Shram' → Enter Aadhaar-linked mobile OTP → Fill basic details and occupation → Submit. Get a UAN (Universal Account Number) card with ₹2 lakh PMSBY accident insurance instantly. Entire process is free and takes 5 minutes."],
-    ["What is PM Mudra Yojana and how to apply?", "PM Mudra provides collateral-free business loans: Shishu (up to ₹50,000), Kishor (₹50K–₹5L), Tarun (₹5L–₹10L). Visit mudra.org.in or apply at any bank/MFI with: Aadhaar, PAN, 6-month bank statements, business proof, project report."],
-    ["How to find nearest CSC?", "Visit locator.csccloud.in → Enter your pincode → Find nearest CSC. You can also use the search box above on this page! CSCs provide Aadhaar, PAN, Passport, Scholarship, PM Kisan, Birth/Income/Caste certificates at ₹30–₹100 service fee."],
-    ["How to link PAN with Aadhaar?", "Visit incometax.gov.in → Login/Register → 'Link Aadhaar' in Quick Links → Enter PAN and Aadhaar number → Pay ₹1,000 penalty via Challan 280 (if deadline passed) → Submit. Or SMS: UIDPAN<space>12-digit-Aadhaar<space>10-digit-PAN to 567678."],
-    ["How to apply for MGNREGA job card?", "Visit your Gram Panchayat or Block Development Office → Fill application form with name, age, Aadhaar, bank details, address → Job card issued within 15 days. Then submit Form B demanding work → Work allocated within 15 days → Payment credited within 15 days of work completion."],
-  ];
-
   const EMERGENCY = [
-    { num:"112", label:"All Emergencies", desc:"Single emergency number — police, fire, ambulance", icon:"🆘", color:"#b71c1c", bg:"#ffebee" },
-    { num:"100", label:"Police", desc:"Local police station, crime, law & order", icon:"👮", color:"#1565c0", bg:"#e3f2fd" },
-    { num:"101", label:"Fire Brigade", desc:"Fire emergency, rescue operations", icon:"🚒", color:"#e65100", bg:"#fff3e0" },
-    { num:"102", label:"Ambulance", desc:"Medical emergency, patient transport", icon:"🚑", color:"#1b5e20", bg:"#e8f5e9" },
-    { num:"108", label:"Emergency Ambulance", desc:"Free ambulance service in most states", icon:"🏥", color:"#1b5e20", bg:"#e8f5e9" },
-    { num:"1098", label:"Child Helpline", desc:"Children in distress, abuse, missing child", icon:"👶", color:"#6a1b9a", bg:"#f3e5f5" },
-    { num:"181", label:"Women Helpline", desc:"Violence against women, distress calls", icon:"👩", color:"#880e4f", bg:"#fce4ec" },
-    { num:"1091", label:"Women in Distress", desc:"Police assistance for women in danger", icon:"🛡️", color:"#880e4f", bg:"#fce4ec" },
-    { num:"182", label:"Anti-Human Trafficking", desc:"Trafficking, forced labour complaints", icon:"🔗", color:"#4a148c", bg:"#ede7f6" },
-    { num:"1930", label:"Cyber Crime", desc:"Online fraud, cyberbullying, hacking", icon:"💻", color:"#004d40", bg:"#e0f2f1" },
-    { num:"14567", label:"Senior Citizen", desc:"Elderly in distress, elder abuse", icon:"👴", color:"#5d4037", bg:"#efebe9" },
-    { num:"1800-180-1104", label:"Disaster Management", desc:"Floods, earthquakes, natural disasters (NDMA)", icon:"🌊", color:"#01579b", bg:"#e1f5fe" },
-    { num:"104", label:"Medical Helpline", desc:"Health advice, doctor consultation (NHM)", icon:"💊", color:"#1565c0", bg:"#e3f2fd" },
-    { num:"1800-11-0031", label:"Road Accident", desc:"Highway accident emergency, NHAI helpline", icon:"🚗", color:"#e65100", bg:"#fff3e0" },
-    { num:"103", label:"Traffic Police", desc:"Road accidents, traffic violations", icon:"🚦", color:"#1565c0", bg:"#e3f2fd" },
-    { num:"1800-121-3468", label:"CSC Helpline", desc:"Common Service Centre assistance", icon:"🏢", color:"#1b5e20", bg:"#e8f5e9" },
+    { num:"112", label:"All Emergencies", desc:"Police + Fire + Ambulance", icon:"🆘", color:"#b71c1c", bg:"#ffebee", highlight: true },
+    { num:"100", label:"Police", desc:"Crime, law & order", icon:"👮", color:"#1565c0", bg:"#e3f2fd" },
+    { num:"101", label:"Fire Brigade", desc:"Fire emergency, rescue", icon:"🚒", color:"#e65100", bg:"#fff3e0" },
+    { num:"102", label:"Ambulance", desc:"Medical emergency", icon:"🚑", color:"#1b5e20", bg:"#e8f5e9" },
+    { num:"108", label:"Emergency Ambulance", desc:"Free ambulance service", icon:"🏥", color:"#1b5e20", bg:"#e8f5e9" },
+    { num:"1098", label:"Child Helpline", desc:"Children in distress", icon:"👶", color:"#6a1b9a", bg:"#f3e5f5" },
+    { num:"181", label:"Women Helpline", desc:"Violence, distress calls", icon:"👩", color:"#880e4f", bg:"#fce4ec" },
+    { num:"1091", label:"Women in Distress", desc:"Police for women", icon:"🛡️", color:"#880e4f", bg:"#fce4ec" },
+    { num:"182", label:"Anti-Trafficking", desc:"Human trafficking complaints", icon:"🔗", color:"#4a148c", bg:"#ede7f6" },
+    { num:"1930", label:"Cyber Crime", desc:"Online fraud, hacking", icon:"💻", color:"#004d40", bg:"#e0f2f1" },
+    { num:"14567", label:"Senior Citizen", desc:"Elderly in distress", icon:"👴", color:"#5d4037", bg:"#efebe9" },
+    { num:"1800-180-1104", label:"Disaster Management", desc:"Floods, earthquakes (NDMA)", icon:"🌊", color:"#01579b", bg:"#e1f5fe" },
+    { num:"104", label:"Medical Helpline", desc:"Health advice (NHM)", icon:"💊", color:"#1565c0", bg:"#e3f2fd" },
+    { num:"103", label:"Traffic Police", desc:"Accidents, violations", icon:"🚦", color:"#1565c0", bg:"#e3f2fd" },
+    { num:"1906", label:"LPG Emergency", desc:"Gas leak, cylinder issue", icon:"🔥", color:"#e65100", bg:"#fff3e0" },
+    { num:"1912", label:"Electricity Help", desc:"Power failure, electric hazard", icon:"⚡", color:"#f57f17", bg:"#fffde7" },
   ];
 
   const GOV_HELPLINES = [
-    ["Kisan Call Centre", "1800-180-1551"],
-    ["PM Kisan Helpline","155261"],
-    ["Aadhaar Helpline","1947"],
-    ["Passport Seva","1800-258-1800"],
-    ["Income Tax Help","1800-103-0025"],
-    ["EPFO Helpline","1800-118-005"],
-    ["NCS Jobs Portal","1800-425-1514"],
-    ["Ayushman Bharat","14555"],
-    ["ESIC Helpline","1800-11-2526"],
-    ["GST Helpdesk","1800-103-4786"],
-    ["Scholarship NSP","0120-6619540"],
-    ["PMKVY Help","1800-123-9626"],
-    ["Disability Help","1800-111-777"],
-    ["RBI Banking","1800-220-228"],
-    ["LPG Emergency","1906"],
-    ["Railway Inquiry","139"],
-    ["Air India Help","1800-180-1407"],
-    ["Consumer Forum","1800-11-4000"],
-    ["Electricity Help","1912"],
-    ["Water Board Help","1916"],
-    ["Anti-Corruption","1064"],
-    ["RTI Helpline","1800-11-0001"],
-    ["Drugs Controller","1800-180-3024"],
-    ["Food Safety (FSSAI)","1800-112-100"],
+    ["Kisan Call Centre","1800-180-1551"],["PM Kisan Helpline","155261"],
+    ["Aadhaar Helpline","1947"],["Passport Seva","1800-258-1800"],
+    ["Income Tax Help","1800-103-0025"],["EPFO Helpline","1800-118-005"],
+    ["NCS Jobs Portal","1800-425-1514"],["Ayushman Bharat","14555"],
+    ["ESIC Helpline","1800-11-2526"],["GST Helpdesk","1800-103-4786"],
+    ["Scholarship NSP","0120-6619540"],["PMKVY Help","1800-123-9626"],
+    ["Disability Help","1800-111-777"],["RBI Banking","1800-220-228"],
+    ["Railway Inquiry","139"],["Consumer Forum","1800-11-4000"],
+    ["Anti-Corruption","1064"],["RTI Helpline","1800-11-0001"],
+    ["Food Safety (FSSAI)","1800-112-100"],["Water Board Help","1916"],
+    ["Road Accident NHAI","1800-11-0031"],["CSC Helpline","1800-121-3468"],
+    ["Air India Help","1800-180-1407"],["Drugs Controller","1800-180-3024"],
+  ];
+
+  const FAQS = [
+    ["How do I update my Aadhaar address online?", "Visit uidai.gov.in, click Update Aadhaar, enter your 12-digit Aadhaar, select Address Update, upload valid address proof (electricity bill or bank statement), pay Rs.50 online, and note the URN for tracking. Update reflects in 30-90 days."],
+    ["How to check Ayushman Bharat eligibility?", "Visit pmjay.gov.in, click Am I Eligible, enter your mobile or ration card number. If your family is in the SECC 2011 database, you get Rs.5 lakh per year free health cover at 27,000+ empanelled hospitals. Call 14555 for help."],
+    ["How to apply for PM Kisan?", "Visit pmkisan.gov.in, go to Farmers Corner, click New Farmer Registration, enter Aadhaar number, fill land and bank details, then submit. After state approval, Rs.2,000 is credited every 4 months to your bank account."],
+    ["Documents needed for National Scholarship?", "You need: Aadhaar card, bank passbook (Aadhaar-linked), last marksheet with min 50% marks, income certificate from SDM/Tehsildar (income less than Rs.8L), caste certificate if applicable, and college/school enrollment letter. Apply at scholarships.gov.in."],
+    ["How to open Jan Dhan zero-balance account?", "Visit any bank branch or post office with your Aadhaar card and 1 passport photo. Account opens same day with free RuPay debit card, Rs.2 lakh accidental insurance, and Rs.30,000 life insurance."],
+    ["How to register on e-Shram portal?", "Visit eshram.gov.in, click Register on e-Shram, enter your Aadhaar-linked mobile OTP, fill occupation details, then submit. Get a UAN card with Rs.2 lakh PMSBY accident insurance instantly. Free process, takes 5 minutes."],
+    ["What is PM Mudra Yojana?", "PM Mudra provides collateral-free business loans: Shishu (up to Rs.50K), Kishor (Rs.50K to Rs.5L), Tarun (Rs.5L to Rs.10L). Apply at mudra.org.in or nearest bank/MFI with Aadhaar, PAN, bank statements, and project report."],
+    ["How to find nearest CSC?", "Use the search box above on this page! Also visit locator.csccloud.in and enter your pincode. CSCs provide Aadhaar, PAN, Passport, Scholarship, PM Kisan and other govt services at Rs.30-100 service fee."],
+    ["How to link PAN with Aadhaar?", "Visit incometax.gov.in, login, click Link Aadhaar in Quick Links, enter PAN and Aadhaar number, pay Rs.1,000 via Challan 280 if deadline passed, then submit. Or SMS: UIDPAN Aadhaar PAN to 567678."],
+    ["How to apply for MGNREGA job card?", "Visit your Gram Panchayat or BDO office, fill application with name, age, Aadhaar, bank details and address. Job card is issued in 15 days. Then demand work and payment is credited within 15 days of work completion."],
   ];
 
   return (
-    <div style={{ background: "#eef1f6", minHeight: "100vh", padding: "28px 16px" }}>
+    <div style={{ background: "#eef1f6", minHeight: "100vh", padding: "20px 14px" }}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
 
-        {/* Header */}
-        <div style={{ marginBottom: 24 }}>
-          <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 900, color: "#0b1929", marginBottom: 4 }}>🆘 Help & Support Centre</h2>
-          <p style={{ color: "#888", fontSize: 13 }}>Emergency numbers, government helplines, FAQs and nearest help centres — all in one place.</p>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 24, fontWeight: 900, color: "#0b1929", marginBottom: 4 }}>🆘 Help & Support Centre</h2>
+          <p style={{ color: "#888", fontSize: 13 }}>Emergency numbers, government helplines, FAQs and nearest help centres.</p>
         </div>
 
-        {/* EMERGENCY NUMBERS — TOP PRIORITY */}
-        <div style={{ background: "linear-gradient(135deg,#b71c1c,#c62828)", borderRadius: 18, padding: "22px 24px", marginBottom: 18, color: "#fff" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-            <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🆘</div>
+        {/* 1. EMERGENCY & ESSENTIAL SERVICES */}
+        <div style={{ background: "linear-gradient(135deg,#b71c1c,#c62828)", borderRadius: 16, padding: "20px 18px", marginBottom: 16, color: "#fff" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <div style={{ width: 42, height: 42, borderRadius: "50%", background: "rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🆘</div>
             <div>
-              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 900, marginBottom: 2 }}>Emergency & Essential Services</h3>
-              <p style={{ fontSize: 12.5, opacity: 0.85 }}>All numbers are free to call · Available 24/7 · Dial directly from any mobile or landline</p>
+              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 900, marginBottom: 2 }}>Emergency & Essential Services</h3>
+              <p style={{ fontSize: 12, opacity: 0.85 }}>All free to call · Available 24/7 · Dial directly from any phone</p>
             </div>
           </div>
-
-          {/* 112 — Highlighted */}
-          <div style={{ background: "rgba(255,255,255,.15)", border: "2px solid rgba(255,255,255,.4)", borderRadius: 14, padding: "16px 20px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ fontSize: 36 }}>🆘</div>
+          {/* 112 highlighted */}
+          <div style={{ background: "rgba(255,255,255,.18)", border: "2px solid rgba(255,255,255,.5)", borderRadius: 14, padding: "14px 16px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 32 }}>🆘</span>
               <div>
-                <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: 2 }}>112</div>
-                <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.9 }}>National Emergency Number — Police + Fire + Ambulance</div>
-                <div style={{ fontSize: 11.5, opacity: 0.75, marginTop: 2 }}>Works on all networks · Even without SIM or signal · Single call for all emergencies</div>
+                <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: 2 }}>112</div>
+                <div style={{ fontSize: 12, fontWeight: 700 }}>National Emergency — Police + Fire + Ambulance</div>
+                <div style={{ fontSize: 11, opacity: 0.8, marginTop: 2 }}>Works on all networks · Even without SIM</div>
               </div>
             </div>
-            <a href="tel:112" style={{ background: "#fff", color: "#b71c1c", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 900, fontSize: 15, display: "flex", alignItems: "center", gap: 6 }}>📞 Call 112</a>
+            <a href="tel:112" style={{ background: "#fff", color: "#b71c1c", textDecoration: "none", padding: "10px 20px", borderRadius: 10, fontWeight: 900, fontSize: 14 }}>📞 Call 112</a>
           </div>
-
-          {/* Other emergency numbers grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(155px,1fr))", gap: 9 }}>
             {EMERGENCY.filter(e => e.num !== "112").map(e => (
-              <div key={e.num} style={{ background: e.bg, borderRadius: 12, padding: "13px 14px", border: `1.5px solid ${e.color}33` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
-                  <div style={{ fontSize: 22 }}>{e.icon}</div>
-                  <a href={`tel:${e.num.replace(/-/g,"")}`} style={{ background: e.color, color: "#fff", textDecoration: "none", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 800 }}>Call</a>
+              <div key={e.num} style={{ background: e.bg, borderRadius: 11, padding: "11px 12px", border: "1.5px solid " + e.color + "33" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 3 }}>
+                  <span style={{ fontSize: 20 }}>{e.icon}</span>
+                  <a href={"tel:" + e.num.replace(/-/g,"")} style={{ background: e.color, color: "#fff", textDecoration: "none", padding: "3px 8px", borderRadius: 20, fontSize: 10, fontWeight: 800 }}>Call</a>
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: e.color, letterSpacing: 1, marginBottom: 2 }}>{e.num}</div>
-                <div style={{ fontWeight: 800, color: "#0b1929", fontSize: 12.5, marginBottom: 2 }}>{e.label}</div>
-                <div style={{ color: "#666", fontSize: 11, lineHeight: 1.4 }}>{e.desc}</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: e.color, letterSpacing: 0.5, marginBottom: 2 }}>{e.num}</div>
+                <div style={{ fontWeight: 800, color: "#0b1929", fontSize: 11.5, marginBottom: 1 }}>{e.label}</div>
+                <div style={{ color: "#666", fontSize: 10.5 }}>{e.desc}</div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Toll-Free Portal Helpline */}
-        <div style={{ background: "linear-gradient(135deg,#FF9933,#e07b20)", borderRadius: 18, padding: 24, marginBottom: 18, color: "#fff" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 18 }}>
+        {/* 2. IMPORTANT GOVERNMENT HELPLINES */}
+        <div style={{ background: "#0b1929", borderRadius: 16, padding: "20px 18px", marginBottom: 16 }}>
+          <h3 style={{ color: "#FF9933", fontWeight: 900, fontSize: 17, marginBottom: 5 }}>📞 Important Government Helplines</h3>
+          <p style={{ color: "rgba(255,255,255,.45)", fontSize: 12, marginBottom: 16 }}>Scheme-specific helplines · All toll-free</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(165px,1fr))", gap: 9 }}>
+            {GOV_HELPLINES.map(([name, num]) => (
+              <div key={name} style={{ background: "rgba(255,255,255,.07)", borderRadius: 10, padding: "11px 12px", cursor: "pointer" }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.12)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.07)"}>
+                <div style={{ color: "rgba(255,255,255,.55)", fontSize: 11, marginBottom: 4 }}>{name}</div>
+                <a href={"tel:" + num.replace(/-/g,"")} style={{ color: "#FF9933", fontWeight: 900, fontSize: 14, textDecoration: "none", display: "block" }}>📞 {num}</a>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. PORTAL TOLL-FREE HELPLINE */}
+        <div style={{ background: "linear-gradient(135deg,#FF9933,#e07b20)", borderRadius: 16, padding: "20px 18px", marginBottom: 16, color: "#fff" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
             <div>
-              <div style={{ fontSize: 28, marginBottom: 6 }}>📞</div>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 900, marginBottom: 4 }}>Portal Toll-Free Helpline</div>
-              <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: 2, marginBottom: 4 }}>1800-111-555</div>
-              <div style={{ opacity: .9, fontSize: 13 }}>24/7 · Free from any phone · Available 24/7</div>
+              <div style={{ fontSize: 26, marginBottom: 5 }}>📞</div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 900, marginBottom: 4 }}>Portal Toll-Free Helpline</div>
+              <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: 2, marginBottom: 4 }}>1800-111-555</div>
+              <div style={{ opacity: .9, fontSize: 13 }}>24/7 · Free · Scheme guidance assistance</div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, justifyContent: "center" }}>
-              <a href="tel:1800111555" style={{ background: "#fff", color: "#e07b20", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 900, cursor: "pointer", fontFamily: "inherit", textAlign: "center" }}>📞 Call Now</a>
-              <button style={{ background: "rgba(255,255,255,.18)", color: "#fff", border: "2px solid rgba(255,255,255,.4)", padding: "12px 24px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>💬 WhatsApp Help</button>
+              <a href="tel:1800111555" style={{ background: "#fff", color: "#e07b20", textDecoration: "none", padding: "11px 22px", borderRadius: 10, fontWeight: 900, textAlign: "center", fontSize: 14 }}>📞 Call Now</a>
+              <button style={{ background: "rgba(255,255,255,.18)", color: "#fff", border: "2px solid rgba(255,255,255,.4)", padding: "11px 22px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 13 }}>💬 WhatsApp</button>
             </div>
           </div>
         </div>
 
-        {/* Quick Links */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(190px,1fr))", gap: 13, marginBottom: 18 }}>
-          {[
-            { ic:"📍", t:"Find CSC Near You", s:"Common Service Centres", url:"https://locator.csccloud.in", c:"#1b5e20" },
-            { ic:"📝", t:"File RTI Online", s:"Right to Information", url:"https://rtionline.gov.in", c:"#1565c0" },
-            { ic:"😤", t:"File Grievance", s:"CPGRAMS Portal", url:"https://pgportal.gov.in", c:"#4527a0" },
-            { ic:"📱", t:"UMANG App", s:"1,200+ Gov Services", url:"https://web.umang.gov.in", c:"#e25822" },
-          ].map(c => (
-            <a key={c.t} href={c.url} target="_blank" rel="noopener noreferrer" style={{ background: "#fff", borderRadius: 14, padding: 18, textDecoration: "none", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 2px 10px rgba(0,0,0,.06)", border: "2px solid transparent", transition: "border-color .2s" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = c.c}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "transparent"}>
-              <span style={{ fontSize: 26 }}>{c.ic}</span>
-              <div>
-                <div style={{ fontWeight: 800, color: "#0b1929", fontSize: 13.5 }}>{c.t}</div>
-                <div style={{ color: "#aaa", fontSize: 11 }}>{c.s}</div>
-              </div>
-            </a>
-          ))}
-        </div>
-
-        {/* CSC Locator — Functional */}
-        <div style={{ background: "#fff", borderRadius: 16, padding: 24, marginBottom: 18, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }}>
+        {/* 4. FIND NEAREST HELP CENTRE */}
+        <div style={{ background: "#fff", borderRadius: 16, padding: "20px 18px", marginBottom: 16, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }}>
           <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 17, fontWeight: 900, color: "#0b1929", marginBottom: 14 }}>📍 Find Nearest Help Centre</h3>
           <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-            <input
-              value={pincode}
-              onChange={e => { setPincode(e.target.value.replace(/\D/g,"").slice(0,6)); setCscResult(null); }}
+            <input value={pincode} onChange={e => { setPincode(e.target.value.replace(/\D/g,"").slice(0,6)); setCscResult(null); }}
               onKeyDown={e => e.key === "Enter" && searchCSC()}
-              placeholder="Enter your 6-digit Pincode (e.g. 600045, 110001, 400001)"
-              maxLength={6}
-              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "2px solid #e0e4ec", fontSize: 13.5, outline: "none", fontFamily: "inherit" }}
+              placeholder="Enter 6-digit Pincode (e.g. 600045, 110001)" maxLength={6}
+              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "2px solid #e0e4ec", fontSize: 13.5, outline: "none", fontFamily: "inherit", minWidth: 0 }}
               onFocus={e => e.target.style.borderColor = "#FF9933"}
-              onBlur={e => e.target.style.borderColor = "#e0e4ec"}
-            />
-            <button
-              onClick={searchCSC}
-              disabled={searching}
-              style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: searching ? "#ccc" : "#138808", color: "#fff", fontWeight: 800, cursor: searching ? "default" : "pointer", fontFamily: "inherit", fontSize: 13, flexShrink: 0 }}>
-              {searching ? "⏳..." : "Search"}
+              onBlur={e => e.target.style.borderColor = "#e0e4ec"} />
+            <button onClick={searchCSC} disabled={searching}
+              style={{ padding: "11px 18px", borderRadius: 10, border: "none", background: searching ? "#ccc" : "#138808", color: "#fff", fontWeight: 800, cursor: searching ? "default" : "pointer", fontFamily: "inherit", fontSize: 13, flexShrink: 0 }}>
+              {searching ? "..." : "Search"}
             </button>
           </div>
-          {cscResult && cscResult.map((csc, i) => (
-            <div key={i} style={{ padding: 16, background: "#f0fff4", borderRadius: 12, border: "1.5px solid #c3e6cb", marginBottom: i < cscResult.length - 1 ? 10 : 0 }}>
+          {cscResult ? cscResult.map((csc, i) => (
+            <div key={i} style={{ padding: 14, background: "#f0fff4", borderRadius: 12, border: "1.5px solid #c3e6cb", marginBottom: i < cscResult.length-1 ? 10 : 0 }}>
               <div style={{ fontWeight: 800, color: "#0b1929", fontSize: 14, marginBottom: 3 }}>🏢 {csc.name}</div>
-              <div style={{ color: "#555", fontSize: 12.5, marginBottom: 4 }}>📍 {csc.addr} {csc.km !== "Nearby" ? `· ${csc.km} km away` : ""}</div>
+              <div style={{ color: "#555", fontSize: 12.5, marginBottom: 4 }}>📍 {csc.addr} {csc.km !== "Nearby" ? "· " + csc.km + " km away" : ""}</div>
               <div style={{ color: "#138808", fontWeight: 700, fontSize: 12, marginBottom: 4 }}>⏰ {csc.hrs} · 📞 {csc.ph}</div>
-              <div style={{ color: "#777", fontSize: 11.5 }}>✅ Services: {csc.svcs}</div>
+              <div style={{ color: "#777", fontSize: 11.5 }}>✅ {csc.svcs}</div>
             </div>
-          ))}
-          {!cscResult && (
-            <div style={{ padding: 14, background: "#f8f9fb", borderRadius: 10, border: "1px dashed #dde" }}>
-              <div style={{ color: "#aaa", fontSize: 12.5, textAlign: "center" }}>
-                Enter your pincode above to find nearest Common Service Centres.<br/>
-                <span style={{ fontSize: 11 }}>Try: 600045 (Chennai) · 110001 (Delhi) · 400001 (Mumbai) · 560001 (Bangalore)</span>
-              </div>
+          )) : (
+            <div style={{ padding: 12, background: "#f8f9fb", borderRadius: 10, border: "1px dashed #dde", textAlign: "center" }}>
+              <div style={{ color: "#aaa", fontSize: 12.5 }}>Enter pincode to find nearest CSC</div>
+              <div style={{ color: "#bbb", fontSize: 11, marginTop: 4 }}>Try: 600045 · 110001 · 400001 · 560001 · 500001</div>
             </div>
           )}
         </div>
 
-        {/* FAQ */}
-        <div style={{ background: "#fff", borderRadius: 16, padding: 24, marginBottom: 18, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }}>
-          <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 900, color: "#0b1929", marginBottom: 20 }}>💬 Frequently Asked Questions</h3>
+        {/* 5. FREQUENTLY ASKED QUESTIONS */}
+        <div style={{ background: "#fff", borderRadius: 16, padding: "20px 18px", marginBottom: 16, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }}>
+          <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 900, color: "#0b1929", marginBottom: 18 }}>💬 Frequently Asked Questions</h3>
           {FAQS.map(([q, a], i) => (
-            <div key={i} style={{ borderBottom: i < FAQS.length - 1 ? "1px solid #f0f2f5" : "none", marginBottom: 14, paddingBottom: 14 }}>
-              <div onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ display: "flex", justifyContent: "space-between", cursor: "pointer", alignItems: "flex-start", gap: 12 }}>
+            <div key={i} style={{ borderBottom: i < FAQS.length-1 ? "1px solid #f0f2f5" : "none", marginBottom: 13, paddingBottom: 13 }}>
+              <div onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ display: "flex", justifyContent: "space-between", cursor: "pointer", alignItems: "flex-start", gap: 10 }}>
                 <span style={{ fontWeight: 700, color: "#0b1929", fontSize: 13.5, flex: 1, lineHeight: 1.5 }}>{q}</span>
                 <span style={{ color: "#FF9933", fontSize: 20, fontWeight: 800, flexShrink: 0, display: "inline-block", transform: openFaq === i ? "rotate(45deg)" : "none", transition: "transform .2s" }}>+</span>
               </div>
@@ -1375,43 +1333,44 @@ function HelpPage() {
           ))}
         </div>
 
-        {/* Government Helplines */}
-        <div style={{ background: "#0b1929", borderRadius: 16, padding: 24, marginBottom: 18 }}>
-          <h3 style={{ color: "#FF9933", fontWeight: 900, fontSize: 17, marginBottom: 6 }}>📞 Important Government Helplines</h3>
-          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 12, marginBottom: 18 }}>Scheme-specific helplines · All toll-free · Available during working hours unless stated</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(185px,1fr))", gap: 10 }}>
-            {GOV_HELPLINES.map(([name, num]) => (
-              <div key={name} style={{ background: "rgba(255,255,255,.07)", borderRadius: 10, padding: "12px 14px", cursor: "pointer", transition: "background .2s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.12)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.07)"}>
-                <div style={{ color: "rgba(255,255,255,.6)", fontSize: 11, marginBottom: 4 }}>{name}</div>
-                <a href={`tel:${num.replace(/-/g,"")}`} style={{ color: "#FF9933", fontWeight: 900, fontSize: 14.5, textDecoration: "none", display: "block" }}>📞 {num}</a>
+        {/* 6. STAY SAFE TIPS */}
+        <div style={{ background: "#fff", borderRadius: 16, padding: "20px 18px", marginBottom: 16, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }}>
+          <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 17, fontWeight: 900, color: "#0b1929", marginBottom: 16 }}>🛡️ Stay Safe — Important Tips</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 12 }}>
+            {[
+              { icon:"🔒", title:"Never Share OTP", desc:"Government officials never ask for OTPs. Hang up if someone asks for your OTP, password or bank details." },
+              { icon:"🌐", title:"Check Website URL", desc:"Always verify the URL ends with .gov.in before entering personal information on any government portal." },
+              { icon:"📵", title:"Beware Fake Calls", desc:"Fraudsters pose as officials. Use only official helpline numbers. Never call back unknown numbers." },
+              { icon:"📋", title:"Keep Documents Safe", desc:"Keep photocopies of Aadhaar and PAN. Report loss immediately to the issuing authority." },
+            ].map(tip => (
+              <div key={tip.title} style={{ background: "#f8f9fb", borderRadius: 12, padding: 14, border: "1.5px solid #e8eaf0" }}>
+                <div style={{ fontSize: 22, marginBottom: 7 }}>{tip.icon}</div>
+                <div style={{ fontWeight: 800, color: "#0b1929", fontSize: 13, marginBottom: 5 }}>{tip.title}</div>
+                <div style={{ color: "#666", fontSize: 12, lineHeight: 1.6 }}>{tip.desc}</div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Safety Tips */}
-        <div style={{ background: "#fff", borderRadius: 16, padding: 24, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }}>
-          <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 17, fontWeight: 900, color: "#0b1929", marginBottom: 16 }}>🛡️ Stay Safe — Important Tips</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 12 }}>
-            {[
-              { icon:"🔒", title:"Never Share OTP", desc:"Government officials never ask for OTPs. Hang up immediately if someone asks for your OTP, password or bank details." },
-              { icon:"🌐", title:"Check Website URL", desc:"Always verify the URL ends with .gov.in before entering personal information on any government portal." },
-              { icon:"📵", title:"Beware of Fake Calls", desc:"Fraudsters pose as government officials. Use official helpline numbers only. Never call back unknown numbers." },
-              { icon:"📋", title:"Keep Documents Safe", desc:"Keep photocopies of Aadhaar, PAN, and other documents. Report loss immediately to the issuing authority." },
-            ].map(tip => (
-              <div key={tip.title} style={{ background: "#f8f9fb", borderRadius: 12, padding: 16, border: "1.5px solid #e8eaf0" }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>{tip.icon}</div>
-                <div style={{ fontWeight: 800, color: "#0b1929", fontSize: 13.5, marginBottom: 5 }}>{tip.title}</div>
-                <div style={{ color: "#666", fontSize: 12.5, lineHeight: 1.6 }}>{tip.desc}</div>
-              </div>
-            ))}
-          </div>
+        {/* Quick Links */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 11 }}>
+          {[
+            { ic:"📍", t:"Find CSC", s:"Common Service Centres", url:"https://locator.csccloud.in", c:"#1b5e20" },
+            { ic:"📝", t:"File RTI", s:"Right to Information", url:"https://rtionline.gov.in", c:"#1565c0" },
+            { ic:"😤", t:"File Grievance", s:"CPGRAMS Portal", url:"https://pgportal.gov.in", c:"#4527a0" },
+            { ic:"📱", t:"UMANG App", s:"1,200+ Gov Services", url:"https://web.umang.gov.in", c:"#e25822" },
+          ].map(cc => (
+            <a key={cc.t} href={cc.url} target="_blank" rel="noopener noreferrer"
+              style={{ background: "#fff", borderRadius: 13, padding: 16, textDecoration: "none", display: "flex", alignItems: "center", gap: 11, boxShadow: "0 2px 10px rgba(0,0,0,.06)", border: "2px solid transparent", transition: "border-color .2s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = cc.c}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "transparent"}>
+              <span style={{ fontSize: 24, flexShrink: 0 }}>{cc.ic}</span>
+              <div><div style={{ fontWeight: 800, color: "#0b1929", fontSize: 13 }}>{cc.t}</div><div style={{ color: "#aaa", fontSize: 10.5 }}>{cc.s}</div></div>
+            </a>
+          ))}
         </div>
 
       </div>
     </div>
   );
-
 }
