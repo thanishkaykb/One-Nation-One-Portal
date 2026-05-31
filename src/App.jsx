@@ -169,7 +169,7 @@ const NEWS = [
 ];
 const TC={Farmer:"#7c4b00",Student:"#1b5e20",Health:"#1565c0",Rural:"#4e342e",Women:"#880e4f",Employment:"#4527a0","Self-Employed":"#4527a0",Entrepreneur:"#283593",Financial:"#880e4f",Insurance:"#6a1b9a",Housing:"#00695c",Disability:"#37474f",Elderly:"#5d4037",BPL:"#b71c1c",Youth:"#4a148c",OBC:"#37474f",SC:"#1a237e",ST:"#1b5e20",Child:"#006064",Education:"#1b5e20",Digital:"#006064",Unorganised:"#546e7a",Urban:"#0d47a1"};
 
-const BOT_GREETING = `Namaste! 🙏 I'm **Sahayak**, your AI government scheme assistant.\n\nI can help you with:\n• Which schemes you qualify for\n• How to apply for Aadhaar, PAN, Passport\n• Scholarship and education loans\n• Health schemes for your family\n• Farmer schemes and crop insurance\n\nJust type your question below!`;
+const BOT_GREETING = `Namaste! 🙏 I'm **Kegothyo**, your AI government scheme assistant.\n\nI can help you with:\n• Which schemes you qualify for\n• How to apply for Aadhaar, PAN, Passport\n• Scholarship and education loans\n• Health schemes for your family\n• Farmer schemes and crop insurance\n\nJust type your question below!`;
 
 const respond = q => {
   const l = q.toLowerCase();
