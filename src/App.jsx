@@ -993,7 +993,7 @@ function EligibilityPage({ setPage }) {
 function SchemesPage() {
   const ALL_TAGS = ["All", "Farmer", "Student", "Health", "Rural", "Women", "Employment", "Financial", "Housing", "Disability", "Elderly", "BPL", "Youth", "SC", "ST", "OBC", "Child", "Education"];
   const [tag, setTag] = useState("All");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(localStorage.getItem("schemeSearch") || "");
   const [expanded, setExpanded] = useState(null);
   const filtered = SCHEMES.filter(s => {
     const tagOk = tag === "All" || s.tags.includes(tag);
