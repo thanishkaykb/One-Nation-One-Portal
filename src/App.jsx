@@ -735,7 +735,7 @@ export default function App() {
             <div style={{ background: "linear-gradient(135deg,#0b1929,#162840)", padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FF9933", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🤖</div>
               <div>
-                <div style={{ color: "#fff", fontWeight: 800, fontSize: 13 }}>Sahayak – Scheme Assistant</div>
+                <div style={{ color: "#fff", fontWeight: 800, fontSize: 13 }}>Kegothyo – Scheme Assistant</div>
                 <div style={{ color: "#4caf50", fontSize: 10, display: "flex", alignItems: "center", gap: 4 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4caf50", display: "inline-block" }} />
                   Online · Replies instantly
