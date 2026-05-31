@@ -808,7 +808,7 @@ function HomePage({ setPage }) {
       </div>
       <div style={{ background: "#eef1f6", padding: "48px 20px" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 900, color: "#0b1929", marginBottom: 6 }}>Explore All Services</h2>
+          <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 900, color: "#0b1929", marginBottom: 6 }}>Available Services in One Nation, One Portal</h2>
           <p style={{ color: "#778", fontSize: 13 }}>These are the service categories available on our portal. Browse the categories below to discover relevant government schemes, services, and official resources.</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: 14, maxWidth: 1000, margin: "0 auto" }}>
