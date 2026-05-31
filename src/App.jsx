@@ -797,11 +797,7 @@ function HomePage({ setPage }) {
         </div>
         <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(28px,5vw,54px)", fontWeight: 900, lineHeight: 1.08, background: "linear-gradient(135deg,#fff 15%,#FF9933 55%,#5dd96e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 14 }}>One Nation, One Portal</h1>
         <p style={{ color: "rgba(255,255,255,.58)", fontSize: 16, maxWidth: 520, margin: "0 auto 36px" }}>Every government scheme, every official portal — one trusted gateway for 1.4 billion Indians.</p>
-        <div style={{ maxWidth: 560, margin: "0 auto 20px", display: "flex", background: "rgba(255,255,255,.09)", border: "2px solid rgba(255,255,255,.18)", borderRadius: 50, padding: "4px 4px 4px 22px" }}>
-          <span style={{ fontSize: 16, marginRight: 8, color: "rgba(255,255,255,.6)" }}>🔍</span>
-          <input value={sq} onChange={e => setSq(e.target.value)} placeholder="Search schemes, portals or services..." style={{ flex: 1, background: "none", border: "none", outline: "none", color: "#fff", fontSize: 14, fontFamily: "inherit" }} />
-          <button onClick={() => navigate('schemes')} style={{ background: "linear-gradient(135deg,#FF9933,#e07b20)", border: "none", borderRadius: 40, padding: "10px 24px", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: 13 }}>Search</button>
-        </div>
+       
         <div style={{ display: "flex", justifyContent: "center", gap: 36, flexWrap: "wrap", marginTop: 36 }}>
           {[["60+", "Schemes"], ["80+", "Portals"], ["24/7", "Support"], ["1.4B", "Citizens"]].map(([n, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
