@@ -809,7 +809,7 @@ function HomePage({ setPage }) {
       <div style={{ background: "#eef1f6", padding: "48px 20px" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 900, color: "#0b1929", marginBottom: 6 }}>Explore All Services</h2>
-          <p style={{ color: "#778", fontSize: 13 }}>Tap any category to browse schemes and apply directly</p>
+          <p style={{ color: "#778", fontSize: 13 }}>These are the service categories available on our portal. Browse the categories below to discover relevant government schemes, services, and official resources.</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: 14, maxWidth: 1000, margin: "0 auto" }}>
           {CATS.map((c, i) => (
@@ -818,7 +818,6 @@ function HomePage({ setPage }) {
               <div style={{ fontSize: 30, marginBottom: 10 }}>{c.icon}</div>
               <div style={{ fontWeight: 800, color: "#0b1929", fontSize: 14.5, marginBottom: 4 }}>{c.t}</div>
               <div style={{ color: "#999", fontSize: 11, marginBottom: 14 }}>{c.s}</div>
-              <div style={{ color: c.c, fontWeight: 700, fontSize: 12 }}>Explore →</div>
             </div>
           ))}
         </div>
