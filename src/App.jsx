@@ -782,7 +782,6 @@ function HomePage({ setPage }) {
     { icon: "🔗", t: "All Official Portals", s: "80+ direct apply links", c: "#37474f", p: "portals" },
   ];
   const [hov, setHov] = useState(null);
-  const [sq, setSq] = useState("");
   return (
     <div>
       <div style={{ background: "linear-gradient(155deg,#071020 0%,#0d1f38 50%,#0a2b1a 100%)", padding: "60px 20px 52px", textAlign: "center", position: "relative", overflow: "hidden" }}>
