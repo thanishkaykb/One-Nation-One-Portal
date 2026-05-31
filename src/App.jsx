@@ -822,15 +822,6 @@ function HomePage({ setPage }) {
           ))}
         </div>
       </div>
-      <div style={{ background: "linear-gradient(135deg,#1b5e20,#0d3d0d)", padding: "52px 20px", textAlign: "center" }}>
-        <div style={{ fontSize: 44, marginBottom: 12 }}>🎯</div>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", color: "#fff", fontSize: 26, fontWeight: 900, marginBottom: 10 }}>Don't know which schemes you qualify for?</h2>
-        <p style={{ color: "rgba(255,255,255,.78)", fontSize: 14.5, maxWidth: 480, margin: "0 auto 28px" }}>Answer 5 quick questions and instantly discover all schemes you're eligible for.</p>
-        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={() => navigate('eligibility')} style={{ background: "#FF9933", border: "none", borderRadius: 50, padding: "14px 36px", color: "#fff", fontWeight: 900, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Check My Eligibility →</button>
-          <button onClick={() => navigate('schemes')} style={{ background: "rgba(255,255,255,.12)", border: "2px solid rgba(255,255,255,.3)", borderRadius: 50, padding: "14px 30px", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Browse All 60 Schemes</button>
-        </div>
-      </div>
       <div style={{ background: "#0b1929", padding: "36px 20px" }}>
         <div style={{ display: "flex", justifyContent: "center", gap: 44, flexWrap: "wrap", maxWidth: 900, margin: "0 auto" }}>
           {[["🔒", "100% Verified", "Only .gov.in official links"], ["📱", "Mobile-First", "Works on any device"], ["♿", "Accessible", "WCAG 2.1 AA"], ["💬", "AI Chat Help", "Sahayak assistant"], ["🆘", "Free Helpline", "1800-111-555"]].map(([ic, t, d]) => (
